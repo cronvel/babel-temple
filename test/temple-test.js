@@ -45,9 +45,15 @@ var expect = require( 'expect.js' ) ;
 
 
 
+it( "test" , function() {
+	console.log( Temple.parse( "Just a \\$ \\{} little {{if $test}}test{{/}}." ) ) ;
+} ) ;
+	
+
+
 describe( "'if' syntax" , function() {
 	
-	it( "test" , function() {
+	it( "if" , function() {
 		var ctx = { test: true } ;
 		
 		expect( Temple.render( "Just a little {{if $test}}test{{/}}." , ctx ) ).to.be( "Just a little test." ) ;
