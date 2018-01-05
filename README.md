@@ -4,23 +4,10 @@
 
 Tiny template engine coupled with babel-tower.
  
-bob
-bob
-bob
-bobby [ { type: 'string', content: '${key}: ${value}\n' } ]
-bobby [ { type: 'string', content: '${key}: ${value}\n' } ]
-bobby [ { type: 'string', content: '${key}: ${value}\n' } ]
-bob
-bobby [ { type: 'string', content: '${value}\n' } ]
-bobby [ { type: 'string', content: '${value}\n' } ]
-bobby [ { type: 'string', content: '${value}\n' } ]
-bob
-bobby [ { type: 'string', content: '${key}: ${value}\n' } ]
-bobby [ { type: 'string', content: '${key}: ${value}\n' } ]
-bobby [ { type: 'string', content: '${key}: ${value}\n' } ]
 # TOC
    - ['if' syntax](#if-syntax)
    - ['foreach' syntax](#foreach-syntax)
+   - ['use' syntax](#use-syntax)
    - [escape syntax](#escape-syntax)
 <a name=""></a>
  
@@ -104,7 +91,7 @@ expect( template.render( { name: "Joe" } ) ).to.be( "Hello stranger!" ) ;
 
 <a name="foreach-syntax"></a>
 # 'foreach' syntax
-'foreach' using an array as the source.
+'foreach' on an array should iterate over each element.
 
 ```js
 var template ;
@@ -124,7 +111,7 @@ template = Temple.parse( '{{foreach $joe => $value}}${value}\n{{/}}' ) ;
 expect( template.render( ctx ) ).to.be( "Joe\nDoe\nNew York\n" ) ;
 ```
 
-'foreach' using an object as the source.
+'foreach' on an object should iterate over each property.
 
 ```js
 var template ;
@@ -161,6 +148,97 @@ var ctx = {
 
 template = Temple.parse( 'key: ${key}\nvalue: ${value}\n{{foreach $joe => $key : $value}}${key}: ${value}\n{{/}}key: ${key}\nvalue: ${value}\n' ) ;
 expect( template.render( ctx ) ).to.be( "key: A key\nvalue: 12k€\nfirst name: Joe\nlast name: Doe\ncity: New York\nkey: A key\nvalue: 12k€\n" ) ;
+```
+
+'foreach' on a non-object should do nothing.
+
+```js
+var template ;
+
+var ctx = {
+	joe: true ,
+} ;
+
+template = Temple.parse( '{{foreach $joe => $key : $value}}${key}: ${value}\n{{/}}' ) ;
+expect( template.render( ctx ) ).to.be( "" ) ;
+
+template = Temple.parse( '{{foreach $joe => $value}}${value}\n{{/}}' ) ;
+expect( template.render( ctx ) ).to.be( "" ) ;
+
+template = Temple.parse( 'some {{foreach $joe => $key : $value}}${key}: ${value}\n{{/}}text' ) ;
+expect( template.render( ctx ) ).to.be( "some text" ) ;
+```
+
+<a name="use-syntax"></a>
+# 'use' syntax
+if the variable is an object, it should create a new context inside the tag and render it.
+
+```js
+var template , ctx ;
+
+template = Temple.parse( '{{use $path.to.var}}${firstName} ${lastName} of ${city}\n{{/}}' ) ;
+
+ctx = { path: { to: { "var": {
+	firstName: "Joe" ,
+	lastName: "Doe" ,
+	city : "New York"
+} } } } ;
+
+expect( template.render( ctx ) ).to.be( "Joe Doe of New York\n" ) ;
+```
+
+if the variable is an array, it should should iterate over it, using each element as the context.
+
+```js
+var template , ctx ;
+
+template = Temple.parse( '{{use $path.to.var}}${firstName} ${lastName} of ${city}\n{{/}}' ) ;
+
+ctx = { path: { to: { "var": {
+	firstName: "Joe" ,
+	lastName: "Doe" ,
+	city : "New York"
+} } } } ;
+ctx = { path: { to: { "var": [
+	{
+		firstName: "Joe" ,
+		lastName: "Doe" ,
+		city : "New York"
+	} ,
+	{
+		firstName: "Sandra" ,
+		lastName: "Murphy" ,
+		city : "Los Angeles"
+	} 
+] } } } ;
+
+expect( template.render( ctx ) ).to.be( "Joe Doe of New York\nSandra Murphy of Los Angeles\n" ) ;
+```
+
+if the variable is a non-object falsy value, it should not render its inner content.
+
+```js
+var template , ctx ;
+
+template = Temple.parse( '{{use $path.to.var}}${firstName} ${lastName} of ${city}\n{{/}}' ) ;
+
+ctx = { path: { to: { "var": false } } } ;
+
+expect( template.render( ctx ) ).to.be( "" ) ;
+```
+
+if the variable is a non-object truthy value, it should render its inner content.
+
+```js
+var template , ctx ;
+
+ctx = { path: { to: { "var": "some string" } } } ;
+template = Temple.parse( '{{use $path.to.var}}${firstName} ${lastName} of ${city}\n{{/}}' ) ;
+
+expect( template.render( ctx ) ).to.be( "(undefined) (undefined) of (undefined)\n" ) ;
+
+template = Temple.parse( '{{use $path.to.var}}value: $\n{{/}}' ) ;
+expect( template.render( ctx ) ).to.be( "value: some string\n" ) ;
 ```
 
 <a name="escape-syntax"></a>
