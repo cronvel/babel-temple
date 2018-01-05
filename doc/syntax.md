@@ -2,8 +2,8 @@
 ## syntax
 
 {{if expr}}
-{{elsif expr}}
-{{else}}
+{{/elsif expr}}
+{{/else}}
 {{/}}
 
 {{foreach $var in $var}}
