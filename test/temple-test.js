@@ -47,7 +47,7 @@ var expect = require( 'expect.js' ) ;
 
 
 
-describe( "'if' syntax" , function() {
+describe( "'if' tag" , function() {
 	
 	it( "simple 'if' syntax" , function() {
 		expect( Temple.render( "Just a little{{if $test}} test{{/}}." , { test: true } ) ).to.be( "Just a little test." ) ;
@@ -72,7 +72,7 @@ describe( "'if' syntax" , function() {
 		
 	} ) ;
 	
-	it( "'if-else' using the close-open syntaxic sugar" , function() {
+	it( "'if-else' using the close-open syntactic sugar" , function() {
 		expect( Temple.render( "Is it {{if $test}}a test{{/else}}real{{/}}?" , { test: true } ) ).to.be( "Is it a test?" ) ;
 		expect( Temple.render( "Is it {{if $test}}a test{{/else}}real{{/}}?" , { test: false } ) ).to.be( "Is it real?" ) ;
 	} ) ;
@@ -83,7 +83,7 @@ describe( "'if' syntax" , function() {
 		expect( Temple.render( "It is {{if $value > 0 }}positive{{/}}{{elseif $value < 0}}negative{{/}}." , { value: 0 } ) ).to.be( "It is ." ) ;
 	} ) ;
 	
-	it( "'if-elseif' using the close-open syntaxic sugar" , function() {
+	it( "'if-elseif' using the close-open syntactic sugar" , function() {
 		expect( Temple.render( "It is {{if $value > 0 }}positive{{/elseif $value < 0}}negative{{/}}." , { value: 3 } ) ).to.be( "It is positive." ) ;
 		expect( Temple.render( "It is {{if $value > 0 }}positive{{/elseif $value < 0}}negative{{/}}." , { value: -3 } ) ).to.be( "It is negative." ) ;
 		expect( Temple.render( "It is {{if $value > 0 }}positive{{/elseif $value < 0}}negative{{/}}." , { value: 0 } ) ).to.be( "It is ." ) ;
@@ -95,7 +95,7 @@ describe( "'if' syntax" , function() {
 		expect( Temple.render( "It is {{if $value > 0 }}positive{{/}}{{elseif $value < 0}}negative{{/}}{{else}}zero{{/}}." , { value: 0 } ) ).to.be( "It is zero." ) ;
 	} ) ;
 	
-	it( "'if-elseif-else' using the close-open syntaxic sugar" , function() {
+	it( "'if-elseif-else' using the close-open syntactic sugar" , function() {
 		expect( Temple.render( "It is {{if $value > 0 }}positive{{/elseif $value < 0}}negative{{/else}}zero{{/}}." , { value: 3 } ) ).to.be( "It is positive." ) ;
 		expect( Temple.render( "It is {{if $value > 0 }}positive{{/elseif $value < 0}}negative{{/else}}zero{{/}}." , { value: -3 } ) ).to.be( "It is negative." ) ;
 		expect( Temple.render( "It is {{if $value > 0 }}positive{{/elseif $value < 0}}negative{{/else}}zero{{/}}." , { value: 0 } ) ).to.be( "It is zero." ) ;
@@ -113,7 +113,7 @@ describe( "'if' syntax" , function() {
 
 
 
-describe( "'foreach' syntax" , function() {
+describe( "'foreach' tag" , function() {
 	
 	it( "'foreach' on an array should iterate over each element" , function() {
 		var template ;
@@ -188,7 +188,7 @@ describe( "'foreach' syntax" , function() {
 
 
 
-describe( "'use' syntax" , function() {
+describe( "'use' tag" , function() {
 	
 	it( "if the variable is an object, it should create a new context inside the tag and render it" , function() {
 		var template , ctx ;
@@ -209,11 +209,6 @@ describe( "'use' syntax" , function() {
 		
 		template = Temple.parse( '{{use $path.to.var}}${firstName} ${lastName} of ${city}\n{{/}}' ) ;
 		
-		ctx = { path: { to: { "var": {
-			firstName: "Joe" ,
-			lastName: "Doe" ,
-			city : "New York"
-		} } } } ;
 		ctx = { path: { to: { "var": [
 			{
 				firstName: "Joe" ,
@@ -230,16 +225,6 @@ describe( "'use' syntax" , function() {
 		expect( template.render( ctx ) ).to.be( "Joe Doe of New York\nSandra Murphy of Los Angeles\n" ) ;
 	} ) ;
 	
-	it( "if the variable is a non-object falsy value, it should not render its inner content" , function() {
-		var template , ctx ;
-		
-		template = Temple.parse( '{{use $path.to.var}}${firstName} ${lastName} of ${city}\n{{/}}' ) ;
-		
-		ctx = { path: { to: { "var": false } } } ;
-		
-		expect( template.render( ctx ) ).to.be( "" ) ;
-	} ) ;
-	
 	it( "if the variable is a non-object truthy value, it should render its inner content" , function() {
 		var template , ctx ;
 		
@@ -250,6 +235,60 @@ describe( "'use' syntax" , function() {
 		
 		template = Temple.parse( '{{use $path.to.var}}value: $\n{{/}}' ) ;
 		expect( template.render( ctx ) ).to.be( "value: some string\n" ) ;
+	} ) ;
+	
+	it( "if the variable is a falsy value, it should not render its inner content" , function() {
+		var template , ctx ;
+		
+		template = Temple.parse( '{{use $path.to.var}}${firstName} ${lastName} of ${city}\n{{/}}' ) ;
+		
+		ctx = { path: { to: { "var": false } } } ;
+		
+		expect( template.render( ctx ) ).to.be( "" ) ;
+	} ) ;
+	
+	it( "'use' syntactic sugar: direct variable" , function() {
+		var template , ctx ;
+		
+		template = Temple.parse( '{{$path.to.var}}${firstName} ${lastName} of ${city}\n{{/}}' ) ;
+		
+		ctx = { path: { to: { "var": [
+			{
+				firstName: "Joe" ,
+				lastName: "Doe" ,
+				city : "New York"
+			} ,
+			{
+				firstName: "Sandra" ,
+				lastName: "Murphy" ,
+				city : "Los Angeles"
+			} 
+		] } } } ;
+		
+		expect( template.render( ctx ) ).to.be( "Joe Doe of New York\nSandra Murphy of Los Angeles\n" ) ;
+	} ) ;
+} ) ;
+
+
+
+describe( "'empty' tag" , function() {
+	
+	it( "if the variable is a falsy value, it should render its inner content" , function() {
+		var template , ctx ;
+		
+		ctx = { path: { to: { "var": false } } } ;
+		template = Temple.parse( '{{empty $path.to.var}}This is empty.{{/}}' ) ;
+		
+		expect( template.render( ctx ) ).to.be( "This is empty." ) ;
+	} ) ;
+	
+	it( "if the variable is a truthy value, it should not render its inner content" , function() {
+		var template , ctx ;
+		
+		ctx = { path: { to: { "var": true } } } ;
+		template = Temple.parse( '{{empty $path.to.var}}This is empty.{{/}}' ) ;
+		
+		expect( template.render( ctx ) ).to.be( "" ) ;
 	} ) ;
 } ) ;
 
