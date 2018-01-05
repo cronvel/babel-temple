@@ -113,10 +113,68 @@ describe( "'if' syntax" , function() {
 
 
 
+describe( "'foreach' syntax" , function() {
+	
+	it( "'foreach' using an array as the source" , function() {
+		var template ;
+		
+		var ctx = {
+			joe: [
+				"Joe" ,
+				"Doe" ,
+				"New York"
+			]
+		} ;
+		
+		template = Temple.parse( '{{foreach $joe => $key : $value}}${key}: ${value}\n{{/}}' ) ;
+		expect( template.render( ctx ) ).to.be( "0: Joe\n1: Doe\n2: New York\n" ) ;
+		
+		template = Temple.parse( '{{foreach $joe => $value}}${value}\n{{/}}' ) ;
+		expect( template.render( ctx ) ).to.be( "Joe\nDoe\nNew York\n" ) ;
+	} ) ;
+	
+	it( "'foreach' using an object as the source" , function() {
+		var template ;
+		
+		var ctx = {
+			joe: {
+				"first name": "Joe" ,
+				"last name": "Doe" ,
+				"city" : "New York"
+			}
+		} ;
+		
+		template = Temple.parse( '{{foreach $joe => $key : $value}}${key}: ${value}\n{{/}}' ) ;
+		expect( template.render( ctx ) ).to.be( "first name: Joe\nlast name: Doe\ncity: New York\n" ) ;
+		
+		template = Temple.parse( '{{foreach $joe => $value}}${value}\n{{/}}' ) ;
+		expect( template.render( ctx ) ).to.be( "Joe\nDoe\nNew York\n" ) ;
+	} ) ;
+	
+	it( "'key' and 'value' variable should be shadowed inside the tag and restored after it" , function() {
+		var template ;
+		
+		var ctx = {
+			key: "A key" ,
+			value: "12k€" ,
+			joe: {
+				"first name": "Joe" ,
+				"last name": "Doe" ,
+				"city" : "New York"
+			}
+		} ;
+		
+		template = Temple.parse( 'key: ${key}\nvalue: ${value}\n{{foreach $joe => $key : $value}}${key}: ${value}\n{{/}}key: ${key}\nvalue: ${value}\n' ) ;
+		expect( template.render( ctx ) ).to.be( "key: A key\nvalue: 12k€\nfirst name: Joe\nlast name: Doe\ncity: New York\nkey: A key\nvalue: 12k€\n" ) ;
+	} ) ;
+} ) ;
+
+
+
 describe( "escape syntax" , function() {
 	it( "escape" , function() {
-		expect( Temple.render( "Just a \\$ \\{} little{{if $test}} test{{/}}." , { test: true } ) ).to.be( "Just a \\$ {} little test." ) ;
-		expect( Temple.render( "Just a \\$ \\{} little{{if $test}} test{{/}}." , { test: false } ) ).to.be( "Just a \\$ {} little." ) ;
+		expect( Temple.render( "Just a \\a \\{} little{{if $test}} test{{/}}." , { test: true } ) ).to.be( "Just a \\a {} little test." ) ;
+		expect( Temple.render( "Just a \\a \\{} little{{if $test}} test{{/}}." , { test: false } ) ).to.be( "Just a \\a {} little." ) ;
 	} ) ;
 } ) ;
 

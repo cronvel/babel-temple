@@ -4,8 +4,23 @@
 
 Tiny template engine coupled with babel-tower.
  
+bob
+bob
+bob
+bobby [ { type: 'string', content: '${key}: ${value}\n' } ]
+bobby [ { type: 'string', content: '${key}: ${value}\n' } ]
+bobby [ { type: 'string', content: '${key}: ${value}\n' } ]
+bob
+bobby [ { type: 'string', content: '${value}\n' } ]
+bobby [ { type: 'string', content: '${value}\n' } ]
+bobby [ { type: 'string', content: '${value}\n' } ]
+bob
+bobby [ { type: 'string', content: '${key}: ${value}\n' } ]
+bobby [ { type: 'string', content: '${key}: ${value}\n' } ]
+bobby [ { type: 'string', content: '${key}: ${value}\n' } ]
 # TOC
    - ['if' syntax](#if-syntax)
+   - ['foreach' syntax](#foreach-syntax)
    - [escape syntax](#escape-syntax)
 <a name=""></a>
  
@@ -87,12 +102,73 @@ expect( template.render( { name: "Bill" } ) ).to.be( "Hello my friend!" ) ;
 expect( template.render( { name: "Joe" } ) ).to.be( "Hello stranger!" ) ;
 ```
 
+<a name="foreach-syntax"></a>
+# 'foreach' syntax
+'foreach' using an array as the source.
+
+```js
+var template ;
+
+var ctx = {
+	joe: [
+		"Joe" ,
+		"Doe" ,
+		"New York"
+	]
+} ;
+
+template = Temple.parse( '{{foreach $joe => $key : $value}}${key}: ${value}\n{{/}}' ) ;
+expect( template.render( ctx ) ).to.be( "0: Joe\n1: Doe\n2: New York\n" ) ;
+
+template = Temple.parse( '{{foreach $joe => $value}}${value}\n{{/}}' ) ;
+expect( template.render( ctx ) ).to.be( "Joe\nDoe\nNew York\n" ) ;
+```
+
+'foreach' using an object as the source.
+
+```js
+var template ;
+
+var ctx = {
+	joe: {
+		"first name": "Joe" ,
+		"last name": "Doe" ,
+		"city" : "New York"
+	}
+} ;
+
+template = Temple.parse( '{{foreach $joe => $key : $value}}${key}: ${value}\n{{/}}' ) ;
+expect( template.render( ctx ) ).to.be( "first name: Joe\nlast name: Doe\ncity: New York\n" ) ;
+
+template = Temple.parse( '{{foreach $joe => $value}}${value}\n{{/}}' ) ;
+expect( template.render( ctx ) ).to.be( "Joe\nDoe\nNew York\n" ) ;
+```
+
+'key' and 'value' variable should be shadowed inside the tag and restored after it.
+
+```js
+var template ;
+
+var ctx = {
+	key: "A key" ,
+	value: "12k€" ,
+	joe: {
+		"first name": "Joe" ,
+		"last name": "Doe" ,
+		"city" : "New York"
+	}
+} ;
+
+template = Temple.parse( 'key: ${key}\nvalue: ${value}\n{{foreach $joe => $key : $value}}${key}: ${value}\n{{/}}key: ${key}\nvalue: ${value}\n' ) ;
+expect( template.render( ctx ) ).to.be( "key: A key\nvalue: 12k€\nfirst name: Joe\nlast name: Doe\ncity: New York\nkey: A key\nvalue: 12k€\n" ) ;
+```
+
 <a name="escape-syntax"></a>
 # escape syntax
 escape.
 
 ```js
-expect( Temple.render( "Just a \\$ \\{} little{{if $test}} test{{/}}." , { test: true } ) ).to.be( "Just a \\$ {} little test." ) ;
-expect( Temple.render( "Just a \\$ \\{} little{{if $test}} test{{/}}." , { test: false } ) ).to.be( "Just a \\$ {} little." ) ;
+expect( Temple.render( "Just a \\a \\{} little{{if $test}} test{{/}}." , { test: true } ) ).to.be( "Just a \\a {} little test." ) ;
+expect( Temple.render( "Just a \\a \\{} little{{if $test}} test{{/}}." , { test: false } ) ).to.be( "Just a \\a {} little." ) ;
 ```
 
