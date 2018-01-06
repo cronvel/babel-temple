@@ -267,6 +267,24 @@ describe( "'use' tag" , function() {
 		
 		expect( template.render( ctx ) ).to.be( "Joe Doe of New York\nSandra Murphy of Los Angeles\n" ) ;
 	} ) ;
+	
+	it( "'join' tag should be used to join rendering parts" , function() {
+		var template , ctx ;
+		
+		template = Temple.parse( '{{$path.to.var}}${firstName} ${lastName}{{/join}} and {{/}}' ) ;
+		
+		ctx = { path: { to: { "var": [] } } } ;
+		expect( template.render( ctx ) ).to.be( "" ) ;
+		
+		ctx.path.to.var.push( { firstName: "Joe" , lastName: "Doe" } ) ;
+		expect( template.render( ctx ) ).to.be( "Joe Doe" ) ;
+		
+		ctx.path.to.var.push( { firstName: "Sandra" , lastName: "Murphy" } ) ;
+		expect( template.render( ctx ) ).to.be( "Joe Doe and Sandra Murphy" ) ;
+		
+		ctx.path.to.var.push( { firstName: "John" , lastName: "Peter" } ) ;
+		expect( template.render( ctx ) ).to.be( "Joe Doe and Sandra Murphy and John Peter" ) ;
+	} ) ;
 } ) ;
 
 
