@@ -373,7 +373,7 @@ describe( "partial rendering: 'call' tag" , function() {
 		expect( template.render( ctx ) ).to.be( "Sandra Murphy of Los Angeles\n" ) ;
 	} ) ;
 	
-	it( "root context preservation?" , function() {
+	it( "no root context preservation" , function() {
 		var template , partial , lib = {} , ctx ;
 		
 		partial = Temple.parse( '${.greetings} ${firstName} ${lastName} of ${city}\n' , { id: 'partial' , lib: lib } ) ;
@@ -395,7 +395,7 @@ describe( "partial rendering: 'call' tag" , function() {
 		} } } ;
 		
 		template = Temple.parse( '{{$path.to.var}}{{call partial/}}{{/}}' , { lib: lib } ) ;
-		expect( template.render( ctx ) ).to.be( "Hello Joe Doe of New York\nHello Sandra Murphy of Los Angeles\n" ) ;
+		expect( template.render( ctx ) ).to.be( "(undefined) Joe Doe of New York\n(undefined) Sandra Murphy of Los Angeles\n" ) ;
 	} ) ;
 } ) ;
 

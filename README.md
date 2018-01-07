@@ -374,7 +374,7 @@ template = Temple.parse( '{{@partial $path.to.var[1]/}}' , { lib: lib } ) ;
 expect( template.render( ctx ) ).to.be( "Sandra Murphy of Los Angeles\n" ) ;
 ```
 
-root context preservation?.
+no root context preservation.
 
 ```js
 var template , partial , lib = {} , ctx ;
@@ -398,7 +398,7 @@ ctx = {
 } } } ;
 
 template = Temple.parse( '{{$path.to.var}}{{call partial/}}{{/}}' , { lib: lib } ) ;
-expect( template.render( ctx ) ).to.be( "Hello Joe Doe of New York\nHello Sandra Murphy of Los Angeles\n" ) ;
+expect( template.render( ctx ) ).to.be( "(undefined) Joe Doe of New York\n(undefined) Sandra Murphy of Los Angeles\n" ) ;
 ```
 
 <a name="root-context"></a>
