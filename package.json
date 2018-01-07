@@ -1,6 +1,6 @@
 {
   "name": "babel-temple",
-  "version": "0.1.5",
+  "version": "0.1.6",
   "description": "Tiny template engine coupled with babel-tower",
   "main": "lib/Temple.js",
   "engines": {

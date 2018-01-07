@@ -308,6 +308,18 @@ describe( "'empty' tag" , function() {
 		
 		expect( template.render( ctx ) ).to.be( "" ) ;
 	} ) ;
+	
+	it( "an 'empty' tag just after a 'use' tag can omit the variable" , function() {
+		var template , ctx ;
+		
+		template = Temple.parse( '{{$path.to.var}}{{/empty}}This is empty.{{/}}' ) ;
+		
+		ctx = { path: { to: { "var": false } } } ;
+		expect( template.render( ctx ) ).to.be( "This is empty." ) ;
+		
+		ctx = { path: { to: { "var": true } } } ;
+		expect( template.render( ctx ) ).to.be( "" ) ;
+	} ) ;
 } ) ;
 
 

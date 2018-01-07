@@ -306,6 +306,20 @@ template = Temple.parse( '{{empty $path.to.var}}This is empty.{{/}}' ) ;
 expect( template.render( ctx ) ).to.be( "" ) ;
 ```
 
+an 'empty' tag just after a 'use' tag can omit the variable.
+
+```js
+var template , ctx ;
+
+template = Temple.parse( '{{$path.to.var}}{{/empty}}This is empty.{{/}}' ) ;
+
+ctx = { path: { to: { "var": false } } } ;
+expect( template.render( ctx ) ).to.be( "This is empty." ) ;
+
+ctx = { path: { to: { "var": true } } } ;
+expect( template.render( ctx ) ).to.be( "" ) ;
+```
+
 <a name="root-context"></a>
 # root context
 the root context should be accessible using the '$.' variable.
