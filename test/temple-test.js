@@ -324,6 +324,83 @@ describe( "'empty' tag" , function() {
 
 
 
+describe( "partial rendering: 'call' tag" , function() {
+	
+	it( "'call' tag should render a sub-template" , function() {
+		var template , partial , lib = {} , ctx ;
+		
+		partial = Temple.parse( '${firstName} ${lastName} of ${city}\n' , { id: 'partial' , lib: lib } ) ;
+		
+		ctx = { path: { to: { "var": [
+			{
+				firstName: "Joe" ,
+				lastName: "Doe" ,
+				city : "New York"
+			} ,
+			{
+				firstName: "Sandra" ,
+				lastName: "Murphy" ,
+				city : "Los Angeles"
+			} 
+		] } } } ;
+		
+		template = Temple.parse( '{{$path.to.var}}{{call partial/}}{{/}}' , { lib: lib } ) ;
+		expect( template.render( ctx ) ).to.be( "Joe Doe of New York\nSandra Murphy of Los Angeles\n" ) ;
+		
+		template = Temple.parse( '{{call partial $path.to.var[0]/}}' , { lib: lib } ) ;
+		expect( template.render( ctx ) ).to.be( "Joe Doe of New York\n" ) ;
+	} ) ;
+	
+	it( "'call' tag '@' syntax" , function() {
+		var template , partial , lib = {} , ctx ;
+		
+		partial = Temple.parse( '${firstName} ${lastName} of ${city}\n' , { id: 'partial' , lib: lib } ) ;
+		
+		ctx = { path: { to: { "var": [
+			{
+				firstName: "Joe" ,
+				lastName: "Doe" ,
+				city : "New York"
+			} ,
+			{
+				firstName: "Sandra" ,
+				lastName: "Murphy" ,
+				city : "Los Angeles"
+			} 
+		] } } } ;
+		
+		template = Temple.parse( '{{@partial $path.to.var[1]/}}' , { lib: lib } ) ;
+		expect( template.render( ctx ) ).to.be( "Sandra Murphy of Los Angeles\n" ) ;
+	} ) ;
+	
+	it( "root context preservation?" , function() {
+		var template , partial , lib = {} , ctx ;
+		
+		partial = Temple.parse( '${.greetings} ${firstName} ${lastName} of ${city}\n' , { id: 'partial' , lib: lib } ) ;
+		
+		ctx = { 
+			greetings: 'Hello' ,
+			path: { to: { "var": [
+				{
+					firstName: "Joe" ,
+					lastName: "Doe" ,
+					city : "New York"
+				} ,
+				{
+					firstName: "Sandra" ,
+					lastName: "Murphy" ,
+					city : "Los Angeles"
+				}
+			]
+		} } } ;
+		
+		template = Temple.parse( '{{$path.to.var}}{{call partial/}}{{/}}' , { lib: lib } ) ;
+		expect( template.render( ctx ) ).to.be( "Hello Joe Doe of New York\nHello Sandra Murphy of Los Angeles\n" ) ;
+	} ) ;
+} ) ;
+
+
+
 describe( "root context" , function() {
 	
 	it( "the root context should be accessible using the '$.' variable" , function() {

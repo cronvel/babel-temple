@@ -3,6 +3,7 @@
    - ['foreach' tag](#foreach-tag)
    - ['use' tag](#use-tag)
    - ['empty' tag](#empty-tag)
+   - [partial rendering: 'call' tag](#partial-rendering-call-tag)
    - [root context](#root-context)
    - [close syntactic sugar syntax](#close-syntactic-sugar-syntax)
    - [escape syntax](#escape-syntax)
@@ -312,6 +313,86 @@ expect( template.render( ctx ) ).to.be( "This is empty." ) ;
 
 ctx = { path: { to: { "var": true } } } ;
 expect( template.render( ctx ) ).to.be( "" ) ;
+```
+
+<a name="partial-rendering-call-tag"></a>
+# partial rendering: 'call' tag
+'call' tag should render a sub-template.
+
+```js
+var template , partial , lib = {} , ctx ;
+
+partial = Temple.parse( '${firstName} ${lastName} of ${city}\n' , { id: 'partial' , lib: lib } ) ;
+
+ctx = { path: { to: { "var": [
+	{
+		firstName: "Joe" ,
+		lastName: "Doe" ,
+		city : "New York"
+	} ,
+	{
+		firstName: "Sandra" ,
+		lastName: "Murphy" ,
+		city : "Los Angeles"
+	} 
+] } } } ;
+
+template = Temple.parse( '{{$path.to.var}}{{call partial/}}{{/}}' , { lib: lib } ) ;
+expect( template.render( ctx ) ).to.be( "Joe Doe of New York\nSandra Murphy of Los Angeles\n" ) ;
+
+template = Temple.parse( '{{call partial $path.to.var[0]/}}' , { lib: lib } ) ;
+expect( template.render( ctx ) ).to.be( "Joe Doe of New York\n" ) ;
+```
+
+'call' tag '@' syntax.
+
+```js
+var template , partial , lib = {} , ctx ;
+
+partial = Temple.parse( '${firstName} ${lastName} of ${city}\n' , { id: 'partial' , lib: lib } ) ;
+
+ctx = { path: { to: { "var": [
+	{
+		firstName: "Joe" ,
+		lastName: "Doe" ,
+		city : "New York"
+	} ,
+	{
+		firstName: "Sandra" ,
+		lastName: "Murphy" ,
+		city : "Los Angeles"
+	} 
+] } } } ;
+
+template = Temple.parse( '{{@partial $path.to.var[1]/}}' , { lib: lib } ) ;
+expect( template.render( ctx ) ).to.be( "Sandra Murphy of Los Angeles\n" ) ;
+```
+
+root context preservation?.
+
+```js
+var template , partial , lib = {} , ctx ;
+
+partial = Temple.parse( '${.greetings} ${firstName} ${lastName} of ${city}\n' , { id: 'partial' , lib: lib } ) ;
+
+ctx = { 
+	greetings: 'Hello' ,
+	path: { to: { "var": [
+		{
+			firstName: "Joe" ,
+			lastName: "Doe" ,
+			city : "New York"
+		} ,
+		{
+			firstName: "Sandra" ,
+			lastName: "Murphy" ,
+			city : "Los Angeles"
+		}
+	]
+} } } ;
+
+template = Temple.parse( '{{$path.to.var}}{{call partial/}}{{/}}' , { lib: lib } ) ;
+expect( template.render( ctx ) ).to.be( "Hello Joe Doe of New York\nHello Sandra Murphy of Los Angeles\n" ) ;
 ```
 
 <a name="root-context"></a>
