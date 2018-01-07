@@ -9,6 +9,8 @@ Tiny template engine coupled with babel-tower.
    - ['foreach' tag](#foreach-tag)
    - ['use' tag](#use-tag)
    - ['empty' tag](#empty-tag)
+   - [root context](#root-context)
+   - [close syntactic sugar syntax](#close-syntactic-sugar-syntax)
    - [escape syntax](#escape-syntax)
 <a name=""></a>
  
@@ -302,6 +304,67 @@ ctx = { path: { to: { "var": true } } } ;
 template = Temple.parse( '{{empty $path.to.var}}This is empty.{{/}}' ) ;
 
 expect( template.render( ctx ) ).to.be( "" ) ;
+```
+
+<a name="root-context"></a>
+# root context
+the root context should be accessible using the '$.' variable.
+
+```js
+var template , ctx ;
+
+ctx = {
+	greetings: "Hello" ,
+	path: { to: { "var": [
+		{
+			firstName: "Joe" ,
+			lastName: "Doe" ,
+			city : "New York"
+		} ,
+		{
+			firstName: "Sandra" ,
+			lastName: "Murphy" ,
+			city : "Los Angeles"
+		} 
+	] } }
+} ;
+
+template = Temple.parse( '{{$path.to.var}}${.greetings} ${firstName} ${lastName} of ${city}\n{{/}}' ) ;
+expect( template.render( ctx ) ).to.be( "Hello Joe Doe of New York\nHello Sandra Murphy of Los Angeles\n" ) ;
+
+template = Temple.parse( '{{$path}}{{$to.var}}${.greetings} ${firstName} ${lastName} of ${city}\n{{//}}' ) ;
+expect( template.render( ctx ) ).to.be( "Hello Joe Doe of New York\nHello Sandra Murphy of Los Angeles\n" ) ;
+
+template = Temple.parse( '{{$path}}{{$to}}{{$var}}${.greetings} ${firstName} ${lastName} of ${city}\n{{///}}' ) ;
+expect( template.render( ctx ) ).to.be( "Hello Joe Doe of New York\nHello Sandra Murphy of Los Angeles\n" ) ;
+```
+
+<a name="close-syntactic-sugar-syntax"></a>
+# close syntactic sugar syntax
+close-open syntactic sugar.
+
+```js
+expect( Temple.render( "Is it {{if $test}}a test{{/else}}real{{/}}?" , { test: true } ) ).to.be( "Is it a test?" ) ;
+expect( Temple.render( "Is it {{if $test}}a test{{/else}}real{{/}}?" , { test: false } ) ).to.be( "Is it real?" ) ;
+```
+
+multiple close syntactic sugar.
+
+```js
+var template , ctx ;
+
+ctx = {
+	path: { to: { "var": {
+			firstName: "Joe" ,
+			lastName: "Doe" ,
+	} } }
+} ;
+
+template = Temple.parse( '{{$path}}{{$to}}{{$var}}${firstName} ${lastName}\n{{//}}${to.var.firstName} ${to.var.lastName}\n{{/}}' ) ;
+expect( template.render( ctx ) ).to.be( "Joe Doe\nJoe Doe\n" ) ;
+
+template = Temple.parse( '{{$path}}{{$to}}{{$var}}${firstName} ${lastName}\n{{///}}${path.to.var.firstName} ${path.to.var.lastName}\n' ) ;
+expect( template.render( ctx ) ).to.be( "Joe Doe\nJoe Doe\n" ) ;
 ```
 
 <a name="escape-syntax"></a>

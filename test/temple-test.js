@@ -312,11 +312,74 @@ describe( "'empty' tag" , function() {
 
 
 
+describe( "root context" , function() {
+	
+	it( "the root context should be accessible using the '$.' variable" , function() {
+		var template , ctx ;
+		
+		ctx = {
+			greetings: "Hello" ,
+			path: { to: { "var": [
+				{
+					firstName: "Joe" ,
+					lastName: "Doe" ,
+					city : "New York"
+				} ,
+				{
+					firstName: "Sandra" ,
+					lastName: "Murphy" ,
+					city : "Los Angeles"
+				} 
+			] } }
+		} ;
+		
+		template = Temple.parse( '{{$path.to.var}}${.greetings} ${firstName} ${lastName} of ${city}\n{{/}}' ) ;
+		expect( template.render( ctx ) ).to.be( "Hello Joe Doe of New York\nHello Sandra Murphy of Los Angeles\n" ) ;
+		
+		template = Temple.parse( '{{$path}}{{$to.var}}${.greetings} ${firstName} ${lastName} of ${city}\n{{//}}' ) ;
+		expect( template.render( ctx ) ).to.be( "Hello Joe Doe of New York\nHello Sandra Murphy of Los Angeles\n" ) ;
+		
+		template = Temple.parse( '{{$path}}{{$to}}{{$var}}${.greetings} ${firstName} ${lastName} of ${city}\n{{///}}' ) ;
+		expect( template.render( ctx ) ).to.be( "Hello Joe Doe of New York\nHello Sandra Murphy of Los Angeles\n" ) ;
+	} ) ;
+} ) ;
+
+
+
+describe( "close syntactic sugar syntax" , function() {
+	
+	it( "close-open syntactic sugar" , function() {
+		expect( Temple.render( "Is it {{if $test}}a test{{/else}}real{{/}}?" , { test: true } ) ).to.be( "Is it a test?" ) ;
+		expect( Temple.render( "Is it {{if $test}}a test{{/else}}real{{/}}?" , { test: false } ) ).to.be( "Is it real?" ) ;
+	} ) ;
+	
+	it( "multiple close syntactic sugar" , function() {
+		var template , ctx ;
+		
+		ctx = {
+			path: { to: { "var": {
+					firstName: "Joe" ,
+					lastName: "Doe" ,
+			} } }
+		} ;
+		
+		template = Temple.parse( '{{$path}}{{$to}}{{$var}}${firstName} ${lastName}\n{{//}}${to.var.firstName} ${to.var.lastName}\n{{/}}' ) ;
+		expect( template.render( ctx ) ).to.be( "Joe Doe\nJoe Doe\n" ) ;
+		
+		template = Temple.parse( '{{$path}}{{$to}}{{$var}}${firstName} ${lastName}\n{{///}}${path.to.var.firstName} ${path.to.var.lastName}\n' ) ;
+		expect( template.render( ctx ) ).to.be( "Joe Doe\nJoe Doe\n" ) ;
+	} ) ;
+} ) ;
+
+
+
 describe( "escape syntax" , function() {
 	it( "escape" , function() {
 		expect( Temple.render( "Just a \\a \\{} little{{if $test}} test{{/}}." , { test: true } ) ).to.be( "Just a \\a {} little test." ) ;
 		expect( Temple.render( "Just a \\a \\{} little{{if $test}} test{{/}}." , { test: false } ) ).to.be( "Just a \\a {} little." ) ;
 	} ) ;
 } ) ;
+
+
 
  
