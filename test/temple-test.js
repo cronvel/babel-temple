@@ -188,6 +188,53 @@ describe( "'foreach' tag" , function() {
 
 
 
+describe( "'let' tag" , function() {
+	
+	it( "'let' tag should create new variable in the current scope" , function() {
+		var template , ctx ;
+		
+		template = Temple.parse( '{{let $greetings : "Hi"/}}${greetings} ${firstName} ${lastName}{{/}}' ) ;
+		
+		ctx = {
+			firstName: "Joe" ,
+			lastName: "Doe"
+		} ;
+		
+		expect( template.render( ctx ) ).to.be( "Hi Joe Doe" ) ;
+	} ) ;
+	
+	it( "only the current context is modified" , function() {
+		var template , ctx ;
+		
+		template = Temple.parse( '{{use $sub}}{{let $greetings : "Hi"/}}${greetings} ${firstName} ${lastName}\n{{/}}${sub.greetings} ${sub.firstName} ${sub.lastName}\n{{/}}' ) ;
+		
+		ctx = { sub: {
+			greetings: "Hello" ,
+			firstName: "Joe" ,
+			lastName: "Doe"
+		} } ;
+		
+		expect( template.render( ctx ) ).to.be( "Hi Joe Doe\nHello Joe Doe\n" ) ;
+		expect( ctx ).to.eql( { sub: { greetings: "Hello" , firstName: "Joe" , lastName: "Doe" } } ) ;
+	} ) ;
+	
+	it( "the original context should be preserved" , function() {
+		var template , ctx ;
+		
+		template = Temple.parse( '{{let $greetings : "Hi"/}}${greetings} ${firstName} ${lastName}{{/}}' ) ;
+		
+		ctx = {
+			firstName: "Joe" ,
+			lastName: "Doe"
+		} ;
+		
+		expect( template.render( ctx ) ).to.be( "Hi Joe Doe" ) ;
+		expect( ctx ).to.eql( { firstName: "Joe" , lastName: "Doe" } ) ;
+	} ) ;
+} ) ;
+
+
+
 describe( "'use' tag" , function() {
 	
 	it( "if the variable is an object, it should create a new context inside the tag and render it" , function() {
