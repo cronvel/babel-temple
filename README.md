@@ -7,9 +7,11 @@ Tiny template engine coupled with babel-tower.
 # TOC
    - ['if' tag](#if-tag)
    - ['foreach' tag](#foreach-tag)
+   - ['let' tag](#let-tag)
    - ['use' tag](#use-tag)
    - ['empty' tag](#empty-tag)
    - [partial rendering: 'call' tag](#partial-rendering-call-tag)
+   - [Template library](#template-library)
    - [root context](#root-context)
    - [close syntactic sugar syntax](#close-syntactic-sugar-syntax)
    - [escape syntax](#escape-syntax)
@@ -173,6 +175,56 @@ template = Temple.parse( 'some {{foreach $joe => $key : $value}}${key}: ${value}
 expect( template.render( ctx ) ).to.be( "some text" ) ;
 ```
 
+<a name="let-tag"></a>
+# 'let' tag
+'let' tag should create new variable in the current scope.
+
+```js
+var template , ctx ;
+
+template = Temple.parse( '{{let $greetings : "Hi"/}}${greetings} ${firstName} ${lastName}{{/}}' ) ;
+
+ctx = {
+	firstName: "Joe" ,
+	lastName: "Doe"
+} ;
+
+expect( template.render( ctx ) ).to.be( "Hi Joe Doe" ) ;
+```
+
+only the current context is modified.
+
+```js
+var template , ctx ;
+
+template = Temple.parse( '{{use $sub}}{{let $greetings : "Hi"/}}${greetings} ${firstName} ${lastName}\n{{/}}${sub.greetings} ${sub.firstName} ${sub.lastName}\n{{/}}' ) ;
+
+ctx = { sub: {
+	greetings: "Hello" ,
+	firstName: "Joe" ,
+	lastName: "Doe"
+} } ;
+
+expect( template.render( ctx ) ).to.be( "Hi Joe Doe\nHello Joe Doe\n" ) ;
+expect( ctx ).to.eql( { sub: { greetings: "Hello" , firstName: "Joe" , lastName: "Doe" } } ) ;
+```
+
+the original context should be preserved.
+
+```js
+var template , ctx ;
+
+template = Temple.parse( '{{let $greetings : "Hi"/}}${greetings} ${firstName} ${lastName}{{/}}' ) ;
+
+ctx = {
+	firstName: "Joe" ,
+	lastName: "Doe"
+} ;
+
+expect( template.render( ctx ) ).to.be( "Hi Joe Doe" ) ;
+expect( ctx ).to.eql( { firstName: "Joe" , lastName: "Doe" } ) ;
+```
+
 <a name="use-tag"></a>
 # 'use' tag
 if the variable is an object, it should create a new context inside the tag and render it.
@@ -326,7 +378,8 @@ expect( template.render( ctx ) ).to.be( "" ) ;
 'call' tag should render a sub-template.
 
 ```js
-var template , partial , lib = {} , ctx ;
+var template , partial , ctx ,
+	lib = new Temple.Lib() ;
 
 partial = Temple.parse( '${firstName} ${lastName} of ${city}\n' , { id: 'partial' , lib: lib } ) ;
 
@@ -353,7 +406,8 @@ expect( template.render( ctx ) ).to.be( "Joe Doe of New York\n" ) ;
 'call' tag '@' syntax.
 
 ```js
-var template , partial , lib = {} , ctx ;
+var template , partial , ctx ,
+	lib = new Temple.Lib() ;
 
 partial = Temple.parse( '${firstName} ${lastName} of ${city}\n' , { id: 'partial' , lib: lib } ) ;
 
@@ -377,7 +431,8 @@ expect( template.render( ctx ) ).to.be( "Sandra Murphy of Los Angeles\n" ) ;
 no root context preservation.
 
 ```js
-var template , partial , lib = {} , ctx ;
+var template , partial , ctx ,
+	lib = new Temple.Lib() ;
 
 partial = Temple.parse( '${.greetings} ${firstName} ${lastName} of ${city}\n' , { id: 'partial' , lib: lib } ) ;
 
@@ -399,6 +454,52 @@ ctx = {
 
 template = Temple.parse( '{{$path.to.var}}{{call partial/}}{{/}}' , { lib: lib } ) ;
 expect( template.render( ctx ) ).to.be( "(undefined) Joe Doe of New York\n(undefined) Sandra Murphy of Los Angeles\n" ) ;
+```
+
+<a name="template-library"></a>
+# Template library
+should load all dependencies.
+
+```js
+var template , partial , ctx ;
+
+var lib = new Temple.Lib( {
+	loadAsync: async function( id ) {
+		//console.log( "id:" , id ) ;
+		switch ( id ) {
+			case 'description' :
+				return '{{call greetings/}} ${firstName} ${lastName} of ${city}{{call punctuation}}\n' ;
+			case 'greetings' :
+				return 'Hello' ;
+			case 'punctuation' :
+				return '!!!' ;
+			default :
+				break ;
+		}
+	}
+} ) ;
+
+
+ctx = { path: { to: { "var": [
+	{
+		firstName: "Joe" ,
+		lastName: "Doe" ,
+		city : "New York"
+	} ,
+	{
+		firstName: "Sandra" ,
+		lastName: "Murphy" ,
+		city : "Los Angeles"
+	} 
+] } } } ;
+
+template = Temple.parse( '{{call greetings/}}!\n{{$path.to.var}}{{call description/}}\n{{/}}' , { lib: lib } ) ;
+
+lib.loadDependenciesAsync().then( () => {
+	expect( template.render( ctx ) ).to.be( "Hello!\nHello Joe Doe of New York!!!\nHello Sandra Murphy of Los Angeles!!!\n" ) ;
+	done() ;
+} )
+.catch( error => done( error ) ) ;
 ```
 
 <a name="root-context"></a>

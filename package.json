@@ -1,6 +1,6 @@
 {
   "name": "babel-temple",
-  "version": "0.2.0",
+  "version": "0.3.0",
   "description": "Tiny template engine coupled with babel-tower",
   "main": "lib/Temple.js",
   "engines": {
@@ -11,8 +11,7 @@
   },
   "dependencies": {
     "babel-tower": "^0.14.4",
-    "kung-fig": "^0.41.1",
-    "tree-kit": "^0.5.26"
+    "kung-fig": "^0.41.1"
   },
   "devDependencies": {
     "expect.js": "^0.3.1",

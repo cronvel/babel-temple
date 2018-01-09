@@ -374,7 +374,8 @@ describe( "'empty' tag" , function() {
 describe( "partial rendering: 'call' tag" , function() {
 	
 	it( "'call' tag should render a sub-template" , function() {
-		var template , partial , lib = {} , ctx ;
+		var template , partial , ctx ,
+			lib = new Temple.Lib() ;
 		
 		partial = Temple.parse( '${firstName} ${lastName} of ${city}\n' , { id: 'partial' , lib: lib } ) ;
 		
@@ -399,7 +400,8 @@ describe( "partial rendering: 'call' tag" , function() {
 	} ) ;
 	
 	it( "'call' tag '@' syntax" , function() {
-		var template , partial , lib = {} , ctx ;
+		var template , partial , ctx ,
+			lib = new Temple.Lib() ;
 		
 		partial = Temple.parse( '${firstName} ${lastName} of ${city}\n' , { id: 'partial' , lib: lib } ) ;
 		
@@ -421,7 +423,8 @@ describe( "partial rendering: 'call' tag" , function() {
 	} ) ;
 	
 	it( "no root context preservation" , function() {
-		var template , partial , lib = {} , ctx ;
+		var template , partial , ctx ,
+			lib = new Temple.Lib() ;
 		
 		partial = Temple.parse( '${.greetings} ${firstName} ${lastName} of ${city}\n' , { id: 'partial' , lib: lib } ) ;
 		
@@ -443,6 +446,53 @@ describe( "partial rendering: 'call' tag" , function() {
 		
 		template = Temple.parse( '{{$path.to.var}}{{call partial/}}{{/}}' , { lib: lib } ) ;
 		expect( template.render( ctx ) ).to.be( "(undefined) Joe Doe of New York\n(undefined) Sandra Murphy of Los Angeles\n" ) ;
+	} ) ;
+} ) ;
+
+
+
+describe( "Template library" , function() {
+	
+	it( "should load all dependencies" , function( done ) {
+		var template , partial , ctx ;
+		
+		var lib = new Temple.Lib( {
+			loadAsync: async function( id ) {
+				//console.log( "id:" , id ) ;
+				switch ( id ) {
+					case 'description' :
+						return '{{call greetings/}} ${firstName} ${lastName} of ${city}{{call punctuation}}\n' ;
+					case 'greetings' :
+						return 'Hello' ;
+					case 'punctuation' :
+						return '!!!' ;
+					default :
+						break ;
+				}
+			}
+		} ) ;
+		
+		
+		ctx = { path: { to: { "var": [
+			{
+				firstName: "Joe" ,
+				lastName: "Doe" ,
+				city : "New York"
+			} ,
+			{
+				firstName: "Sandra" ,
+				lastName: "Murphy" ,
+				city : "Los Angeles"
+			} 
+		] } } } ;
+		
+		template = Temple.parse( '{{call greetings/}}!\n{{$path.to.var}}{{call description/}}\n{{/}}' , { lib: lib } ) ;
+		
+		lib.loadDependenciesAsync().then( () => {
+			expect( template.render( ctx ) ).to.be( "Hello!\nHello Joe Doe of New York!!!\nHello Sandra Murphy of Los Angeles!!!\n" ) ;
+			done() ;
+		} )
+		.catch( error => done( error ) ) ;
 	} ) ;
 } ) ;
 
