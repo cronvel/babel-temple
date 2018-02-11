@@ -1,7 +1,7 @@
 /*
 	Babel Temple
 	
-	Copyright (c) 2017 Cédric Ronvel
+	Copyright (c) 2017 - 2018 Cédric Ronvel
 	
 	The MIT License (MIT)
 	
