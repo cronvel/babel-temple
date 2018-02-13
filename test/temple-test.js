@@ -47,6 +47,27 @@ var expect = require( 'expect.js' ) ;
 
 
 
+describe( "Babel Tower strings" , function() {
+	
+	it( "variable substitution " , function() {
+		expect( Temple.render( "Hello ${name}!" , { name: "Bob" } ) ).to.be( "Hello Bob!" ) ;
+		expect( Temple.render( "Hello ${name1} and ${name2}!" , { name1: "Bob" , name2: "James" } ) ).to.be( "Hello Bob and James!" ) ;
+	} ) ;
+	
+	it( "post-filters " , function() {
+		expect( Temple.render( "Hello ${name//uc1}!" , { name: "bob" } ) ).to.be( "Hello Bob!" ) ;
+	} ) ;
+	
+	it( "complex syntax " , function() {
+		expect( Temple.render( "Hello ${list}[enum:nobody|$|, $| and $]!" , { list: [] } ) ).to.be( "Hello nobody!" ) ;
+		expect( Temple.render( "Hello ${list}[enum:nobody|$|, $| and $]!" , { list: [ "Bob" ] } ) ).to.be( "Hello Bob!" ) ;
+		expect( Temple.render( "Hello ${list}[enum:nobody|$|, $| and $]!" , { list: [ "Bob" , "James" ] } ) ).to.be( "Hello Bob and James!" ) ;
+		expect( Temple.render( "Hello ${list}[enum:nobody|$|, $| and $]!" , { list: [ "Bob" , "James" , "Sarah" ] } ) ).to.be( "Hello Bob, James and Sarah!" ) ;
+	} ) ;
+} ) ;
+
+
+
 describe( "'if' tag" , function() {
 	
 	it( "simple 'if' syntax" , function() {

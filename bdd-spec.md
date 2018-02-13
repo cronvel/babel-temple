@@ -1,4 +1,5 @@
 # TOC
+   - [Babel Tower strings](#babel-tower-strings)
    - ['if' tag](#if-tag)
    - ['foreach' tag](#foreach-tag)
    - ['let' tag](#let-tag)
@@ -11,6 +12,30 @@
    - [escape syntax](#escape-syntax)
 <a name=""></a>
  
+<a name="babel-tower-strings"></a>
+# Babel Tower strings
+variable substitution .
+
+```js
+expect( Temple.render( "Hello ${name}!" , { name: "Bob" } ) ).to.be( "Hello Bob!" ) ;
+expect( Temple.render( "Hello ${name1} and ${name2}!" , { name1: "Bob" , name2: "James" } ) ).to.be( "Hello Bob and James!" ) ;
+```
+
+post-filters .
+
+```js
+expect( Temple.render( "Hello ${name//uc1}!" , { name: "bob" } ) ).to.be( "Hello Bob!" ) ;
+```
+
+complex syntax .
+
+```js
+expect( Temple.render( "Hello ${list}[enum:nobody|$|, $| and $]!" , { list: [] } ) ).to.be( "Hello nobody!" ) ;
+expect( Temple.render( "Hello ${list}[enum:nobody|$|, $| and $]!" , { list: [ "Bob" ] } ) ).to.be( "Hello Bob!" ) ;
+expect( Temple.render( "Hello ${list}[enum:nobody|$|, $| and $]!" , { list: [ "Bob" , "James" ] } ) ).to.be( "Hello Bob and James!" ) ;
+expect( Temple.render( "Hello ${list}[enum:nobody|$|, $| and $]!" , { list: [ "Bob" , "James" , "Sarah" ] } ) ).to.be( "Hello Bob, James and Sarah!" ) ;
+```
+
 <a name="if-tag"></a>
 # 'if' tag
 simple 'if' syntax.
