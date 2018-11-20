@@ -1,6 +1,6 @@
 {
   "name": "babel-temple",
-  "version": "0.4.0",
+  "version": "0.4.1",
   "description": "Tiny template engine coupled with babel-tower",
   "main": "lib/Temple.js",
   "engines": {
@@ -10,15 +10,12 @@
     "test": "test"
   },
   "dependencies": {
-    "babel-tower": "^0.16.0",
-    "kung-fig-dynamic": "^0.41.10",
-    "kung-fig-expression": "^0.41.12",
-    "kung-fig-ref": "^0.41.11"
+    "babel-tower": "^0.18.0",
+    "kung-fig-dynamic": "^0.41.12",
+    "kung-fig-expression": "^0.42.2",
+    "kung-fig-ref": "^0.42.2"
   },
-  "devDependencies": {
-    "expect.js": "^0.3.1",
-    "mocha": "^4.0.1"
-  },
+  "devDependencies": {},
   "repository": {
     "type": "git",
     "url": "https://github.com/cronvel/babel-temple.git"

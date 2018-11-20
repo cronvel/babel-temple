@@ -24,9 +24,6 @@
 	SOFTWARE.
 */
 
-
-
-/* jshint unused:false */
 /* global describe, it, before, after */
 
 "use strict" ;
@@ -34,16 +31,6 @@
 
 
 var Temple = require( '../lib/Temple.js' ) ;
-
-var expect = require( 'expect.js' ) ;
-
-
-
-
-
-			/* Tests */
-
-
 
 
 
@@ -236,7 +223,7 @@ describe( "'let' tag" , function() {
 		} } ;
 		
 		expect( template.render( ctx ) ).to.be( "Hi Joe Doe\nHello Joe Doe\n" ) ;
-		expect( ctx ).to.eql( { sub: { greetings: "Hello" , firstName: "Joe" , lastName: "Doe" } } ) ;
+		expect( ctx ).to.equal( { sub: { greetings: "Hello" , firstName: "Joe" , lastName: "Doe" } } ) ;
 	} ) ;
 	
 	it( "the original context should be preserved" , function() {
@@ -250,7 +237,7 @@ describe( "'let' tag" , function() {
 		} ;
 		
 		expect( template.render( ctx ) ).to.be( "Hi Joe Doe" ) ;
-		expect( ctx ).to.eql( { firstName: "Joe" , lastName: "Doe" } ) ;
+		expect( ctx ).to.equal( { firstName: "Joe" , lastName: "Doe" } ) ;
 	} ) ;
 } ) ;
 
