@@ -239,6 +239,19 @@ describe( "'let' tag" , function() {
 		expect( template.render( ctx ) ).to.be( "Hi Joe Doe" ) ;
 		expect( ctx ).to.equal( { firstName: "Joe" , lastName: "Doe" } ) ;
 	} ) ;
+
+	it( "'let' tag should support Kung-Fig's Expression" , function() {
+		var template , ctx ;
+		
+		template = Temple.parse( '{{let $sum : $a + $b/}}The sum of ${a} and ${b} is ${sum}.{{/}}' ) ;
+		
+		ctx = {
+			a: 4 ,
+			b: 7
+		} ;
+		
+		expect( template.render( ctx ) ).to.be( "The sum of 4 and 7 is 11." ) ;
+	} ) ;
 } ) ;
 
 
@@ -339,6 +352,36 @@ describe( "'use' tag" , function() {
 		
 		ctx.path.to.var.push( { firstName: "John" , lastName: "Peter" } ) ;
 		expect( template.render( ctx ) ).to.be( "Joe Doe and Sandra Murphy and John Peter" ) ;
+	} ) ;
+
+	it( "using strings" , function() {
+		var template , ctx ;
+		
+		template = Temple.parse( '{{$path.to.var}}${}!\n{{/}}Hey!' ) ;
+		
+		ctx = { path: { to: { "var": [
+			"Joe Doe" ,
+			"Sandra Murphy"
+		] } } } ;
+		
+		expect( template.render( ctx ) ).to.be( "Joe Doe!\nSandra Murphy!\nHey!" ) ;
+
+		template = Temple.parse( '{{$people}}${}!\n{{/}}Hey!' ) ;
+		
+		ctx = { people: [
+			"Joe Doe" ,
+			"Sandra Murphy"
+		] } ;
+		
+		expect( template.render( ctx ) ).to.be( "Joe Doe!\nSandra Murphy!\nHey!" ) ;
+
+		ctx = { people: "Joe Doe" } ;
+		
+		expect( template.render( ctx ) ).to.be( "Joe Doe!\nHey!" ) ;
+
+		ctx = { people: null } ;
+		
+		expect( template.render( ctx ) ).to.be( "Hey!" ) ;
 	} ) ;
 } ) ;
 
