@@ -139,6 +139,13 @@ describe( "'foreach' tag" , () => {
 
 		template = Temple.parse( '{{foreach $joe => $value}}${value}\n{{/}}' ) ;
 		expect( template.render( ctx ) ).to.be( "Joe\nDoe\nNew York\n" ) ;
+
+		// With index
+		template = Temple.parse( '{{foreach $joe => $key , $index : $value}}${index}: ${value}\n{{/}}' ) ;
+		expect( template.render( ctx ) ).to.be( "0: Joe\n1: Doe\n2: New York\n" ) ;
+
+		template = Temple.parse( '{{foreach $joe => $key , $index : $value}}${key}: ${value}\n{{/}}' ) ;
+		expect( template.render( ctx ) ).to.be( "0: Joe\n1: Doe\n2: New York\n" ) ;
 	} ) ;
 
 	it( "'foreach' on an object should iterate over each property" , () => {
@@ -157,6 +164,10 @@ describe( "'foreach' tag" , () => {
 
 		template = Temple.parse( '{{foreach $joe => $value}}${value}\n{{/}}' ) ;
 		expect( template.render( ctx ) ).to.be( "Joe\nDoe\nNew York\n" ) ;
+
+		// With index
+		template = Temple.parse( '{{foreach $joe => $key , $index : $value}}${key} (${index}): ${value}\n{{/}}' ) ;
+		expect( template.render( ctx ) ).to.be( "first name (0): Joe\nlast name (1): Doe\ncity (2): New York\n" ) ;
 	} ) ;
 
 	it( "'key' and 'value' variable should be shadowed inside the tag and restored after it" , () => {
