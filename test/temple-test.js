@@ -723,3 +723,14 @@ describe( "escape syntax" , () => {
 	} ) ;
 } ) ;
 
+
+
+describe( "Historical bug" , () => {
+	it( "fix autoboxing" , () => {
+		var template ;
+
+		template = Temple.parse( '{{$rules}}* {{if $ is-string?}}autoboxed ${{/}}\n{{/}}' ) ;
+		expect( template.render( { rules: [ 'rule A' , 'rule B' , 'rule C' ] } ) ).to.be( "* autoboxed rule A\n* autoboxed rule B\n* autoboxed rule C\n" ) ;
+	} ) ;
+} ) ;
+
