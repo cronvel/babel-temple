@@ -265,6 +265,16 @@ describe( "'let' tag" , () => {
 
 		expect( template.render( ctx ) ).to.be( "The sum of 4 and 7 is 11." ) ;
 	} ) ;
+
+	it( "'let' tag should support Expression's object syntax" , () => {
+		var template ;
+
+		template = Temple.parse( '{{let $obj : { "a" : 1 , "b" : 2 } /}}Values: ${obj.a} and ${obj.b}.{{/}}' ) ;
+		expect( template.render( {} ) ).to.be( "Values: 1 and 2." ) ;
+
+		template = Temple.parse( '{{let $obj : {} /}}{{let $obj.a : 1 /}}Values: ${obj.a}.{{/}}' ) ;
+		expect( template.render( {} ) ).to.be( "Values: 1." ) ;
+	} ) ;
 } ) ;
 
 
