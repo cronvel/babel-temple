@@ -700,7 +700,14 @@ describe( "Template library" , () => {
 
 
 
-describe( "root context" , () => {
+describe( "Presets context" , () => {
+	it( "the '$_' variable should contains presets that are always available" ) ;
+	it( "should write tests for that..." ) ;
+} ) ;
+
+
+
+describe( "Root context" , () => {
 
 	it( "the root context should be accessible using the '$.' variable" , () => {
 		var template , ctx ;
