@@ -271,8 +271,43 @@ describe( "'let' tag" , () => {
 
 		template = Temple.parse( '{{let $obj : { "a" : 1 , "b" : 2 } /}}Values: ${obj.a} and ${obj.b}.{{/}}' ) ;
 		expect( template.render( {} ) ).to.be( "Values: 1 and 2." ) ;
+	} ) ;
 
-		template = Temple.parse( '{{let $obj : {} /}}{{let $obj.a : 1 /}}Values: ${obj.a}.{{/}}' ) ;
+	it( "'let' tag should not support dot path assignment" , () => {
+		expect( () => Temple.parse( '{{let $obj : {} /}}{{let $obj.a : 1 /}}Values: ${obj.a}.{{/}}' ) ).to.throw() ;
+	} ) ;
+} ) ;
+
+
+
+describe( "'set' tag" , () => {
+
+	it( "'set' tag should escape ctx copy?" ) ;
+
+	it( "'set' tag should support Kung-Fig's Expression" , () => {
+		var template , ctx ;
+
+		template = Temple.parse( '{{set $sum : $a + $b/}}The sum of ${a} and ${b} is ${sum}.{{/}}' ) ;
+
+		ctx = {
+			a: 4 ,
+			b: 7
+		} ;
+
+		expect( template.render( ctx ) ).to.be( "The sum of 4 and 7 is 11." ) ;
+	} ) ;
+
+	it( "'set' tag should support Expression's object syntax" , () => {
+		var template ;
+
+		template = Temple.parse( '{{set $obj : { "a" : 1 , "b" : 2 } /}}Values: ${obj.a} and ${obj.b}.{{/}}' ) ;
+		expect( template.render( {} ) ).to.be( "Values: 1 and 2." ) ;
+	} ) ;
+
+	it( "'set' tag should support dot path assignment" , () => {
+		var template ;
+
+		template = Temple.parse( '{{set $obj : {} /}}{{set $obj.a : 1 /}}Values: ${obj.a}.{{/}}' ) ;
 		expect( template.render( {} ) ).to.be( "Values: 1." ) ;
 	} ) ;
 } ) ;
